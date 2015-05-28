@@ -45,17 +45,19 @@ namespace TicTacToe.Wpf
 
         private static TicTacToeDomain.MoveResult HandleUserInput(string playedPosition, TicTacToeDomain.MoveResult moveResult)
         {
-            TicTacToeDomain.NextMoveInfo userAction = null;
-
             if (moveResult.IsPlayerXToMove)
-                userAction = (moveResult as TicTacToeDomain.MoveResult.PlayerXToMove).Item2.FirstOrDefault(m => m.posToPlay.ToPositionName() == playedPosition);
+            {
+                var useraction = (moveResult as TicTacToeDomain.MoveResult.PlayerXToMove).Item2.FirstOrDefault(m => m.posToPlay.ToPositionName() == playedPosition);
+                return useraction.capability.Invoke(null);
+            }
 
             if (moveResult.IsPlayerOToMove)
-                userAction = (moveResult as TicTacToeDomain.MoveResult.PlayerOToMove).Item2.FirstOrDefault(m => m.posToPlay.ToPositionName() == playedPosition);
+            {
+                var useraction = (moveResult as TicTacToeDomain.MoveResult.PlayerOToMove).Item2.FirstOrDefault(m => m.posToPlay.ToPositionName() == playedPosition);
+                return useraction.capability.Invoke(null);
+            }
 
-            return userAction != null 
-                ? userAction.capability.Invoke(null) 
-                : moveResult;
+            return moveResult;
         }
     }
 
