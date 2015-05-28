@@ -48,13 +48,13 @@ namespace TicTacToe.Wpf
             if (moveResult.IsPlayerXToMove)
             {
                 var useraction = (moveResult as TicTacToeDomain.MoveResult.PlayerXToMove).Item2.FirstOrDefault(m => m.posToPlay.ToPositionName() == playedPosition);
-                return useraction.capability.Invoke(null);
+                return useraction != null ? useraction.capability.Invoke(null) : moveResult;
             }
 
             if (moveResult.IsPlayerOToMove)
             {
                 var useraction = (moveResult as TicTacToeDomain.MoveResult.PlayerOToMove).Item2.FirstOrDefault(m => m.posToPlay.ToPositionName() == playedPosition);
-                return useraction.capability.Invoke(null);
+                return useraction != null ? useraction.capability.Invoke(null) : moveResult;
             }
 
             return moveResult;
