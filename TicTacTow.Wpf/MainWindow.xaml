@@ -1,0 +1,34 @@
+﻿<Window x:Class="TicTacToe.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Tic Tac Toe" Height="480" Width="400">
+    <StackPanel Margin="15" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal">
+            <Button FontSize="30" Name="LeftTop" Content="" Width="80" Height="80"/>
+            <Button FontSize="30" Name="HCenterTop" Content="" Width="80" Height="80"/>
+            <Button FontSize="30" Name="RightTop" Content="" Width="80" Height="80"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button FontSize="30" Name="LeftVCenter" Content="" Width="80" Height="80"/>
+            <Button FontSize="30" Name="HCenterVCenter" Content="" Width="80" Height="80" />
+            <Button FontSize="30" Name="RightVCenter" Content="" Width="80" Height="80" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button FontSize="30" Name="LeftBottom" Content="" Width="80" Height="80" />
+            <Button FontSize="30" Name="HCenterBottom" Content="" Width="80" Height="80" />
+            <Button FontSize="30" Name="RightBottom" Content="" Width="80" Height="80" />
+        </StackPanel>
+        <Grid Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Name="StatusText" HorizontalAlignment="Left"/>
+            <Button Grid.Column="2" Content="New Game" Width="75" HorizontalAlignment="Right" Name="NewGameButton"/>
+        </Grid>
+        <TextBlock Text="Log:" Margin="0,10,0,5"/>
+        <TextBox Name="Log" Height="100" VerticalScrollBarVisibility="Auto" FontSize="10"/>
+    </StackPanel>
+
+</Window>
