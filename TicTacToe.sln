@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TicTacToe", "TicTacToe\TicTacToe.fsproj", "{CEE7CF7C-4C2B-4B26-8393-3F57E2DEC95B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacTow.Wpf", "TicTacTow.Wpf\TicTacTow.Wpf.csproj", "{B9822B36-DCF4-41C6-AC69-1A515B909C9E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacToe.Wpf", "TicTacTow.Wpf\TicTacToe.Wpf.csproj", "{B9822B36-DCF4-41C6-AC69-1A515B909C9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

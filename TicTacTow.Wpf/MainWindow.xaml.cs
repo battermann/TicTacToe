@@ -32,7 +32,7 @@ namespace TicTacToe.Wpf
             };
 
             ui.Positions
-                .Select(b => Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(x => b.Click += x, x => b.Click -= x).Select(x => ((Button) x.Sender).Name))
+                .Select(b => Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(x => b.Click += x, x => b.Click -= x).Select(x => ((Button) x.Sender).Name.ToPosition()))
                 .Merge()
                 .Select(playedPosition =>
                 {
@@ -43,17 +43,17 @@ namespace TicTacToe.Wpf
                 .Subscribe(ui.Update);
         }
 
-        private static TicTacToeDomain.MoveResult HandleUserInput(string playedPosition, TicTacToeDomain.MoveResult moveResult)
+        private static TicTacToeDomain.MoveResult HandleUserInput(Tuple<TicTacToeDomain.HorizPosition, TicTacToeDomain.VertPosition> playedPosition, TicTacToeDomain.MoveResult moveResult)
         {
             if (moveResult.IsPlayerXToMove)
             {
-                var useraction = (moveResult as TicTacToeDomain.MoveResult.PlayerXToMove).Item2.FirstOrDefault(m => m.posToPlay.ToPositionName() == playedPosition);
+                var useraction = (moveResult as TicTacToeDomain.MoveResult.PlayerXToMove).Item2.FirstOrDefault(m => m.posToPlay.Equals(playedPosition));
                 return useraction != null ? useraction.capability.Invoke(null) : moveResult;
             }
 
             if (moveResult.IsPlayerOToMove)
             {
-                var useraction = (moveResult as TicTacToeDomain.MoveResult.PlayerOToMove).Item2.FirstOrDefault(m => m.posToPlay.ToPositionName() == playedPosition);
+                var useraction = (moveResult as TicTacToeDomain.MoveResult.PlayerOToMove).Item2.FirstOrDefault(m => m.posToPlay.Equals(playedPosition));
                 return useraction != null ? useraction.capability.Invoke(null) : moveResult;
             }
 
@@ -70,12 +70,11 @@ namespace TicTacToe.Wpf
         }
 
         public Button[] Positions { get; private set; }
-        public TextBlock StatusInfo { get; private set; }
+        private TextBlock StatusInfo { get; set; }
 
         public void Update(TicTacToeDomain.MoveResult moveResult)
         {
-            Func<TicTacToeDomain.CellState, string> makeMarker;
-            makeMarker = state =>
+            Func<TicTacToeDomain.CellState, string> makeMarker = state =>
                 state.IsPlayed
                     ? (state as TicTacToeDomain.CellState.Played).Item == TicTacToeDomain.Player.PlayerX ? "X" : "0"
                     : String.Empty;
@@ -98,7 +97,9 @@ namespace TicTacToe.Wpf
             {
                 var gameWon = (moveResult as TicTacToeDomain.MoveResult.GameWon);
                 displayInfo = gameWon.Item1;
-                StatusInfo.Text = String.Format("GAME WON by Player {0}", gameWon.Item2.IsPlayerX ? "X" : "O");
+                var msg = String.Format("GAME WON by Player {0}", gameWon.Item2.IsPlayerX ? "X" : "O");
+                StatusInfo.Text = msg;
+                MessageBox.Show(msg);
             }
 
             if (moveResult.IsGameTied)
@@ -109,33 +110,27 @@ namespace TicTacToe.Wpf
 
             displayInfo.cells
                 .ToList()
-                .ForEach(c => Positions.Single(position => position.Name == c.pos.ToPositionName()).Content = makeMarker(c.state));
+                .ForEach(c => Positions.Single(position => position.Name.ToPosition().Equals(c.pos)).Content = makeMarker(c.state));
         }
     }
 
     public static class Helper
     {
-        public static string ToPositionName(this Tuple<TicTacToeDomain.HorizPosition, TicTacToeDomain.VertPosition> pos)
+        public static Tuple<TicTacToeDomain.HorizPosition, TicTacToeDomain.VertPosition> ToPosition(this string pos)
         {
-            if (pos.Item1.IsLeft && pos.Item2.IsTop)
-                return "LeftTop";
-            if (pos.Item1.IsLeft && pos.Item2.IsVCenter)
-                return "LeftVCenter";
-            if (pos.Item1.IsLeft && pos.Item2.IsBottom)
-                return "LeftBottom";
-            if (pos.Item1.IsHCenter && pos.Item2.IsTop)
-                return "HCenterTop";
-            if (pos.Item1.IsHCenter && pos.Item2.IsVCenter)
-                return "HCenterVCenter";
-            if (pos.Item1.IsHCenter && pos.Item2.IsBottom)
-                return "HCenterBottom";
-            if (pos.Item1.IsRight && pos.Item2.IsTop)
-                return "RightTop";
-            if (pos.Item1.IsRight && pos.Item2.IsVCenter)
-                return "RightVCenter";
-            if (pos.Item1.IsRight && pos.Item2.IsBottom)
-                return "RightBottom";
-            throw new Exception("cannot process cell state");
+            switch (pos)
+            {
+                case "LeftTop": return Tuple.Create(TicTacToeDomain.HorizPosition.Left, TicTacToeDomain.VertPosition.Top);
+                case "LeftVCenter": return Tuple.Create(TicTacToeDomain.HorizPosition.Left, TicTacToeDomain.VertPosition.VCenter);
+                case "LeftBottom": return Tuple.Create(TicTacToeDomain.HorizPosition.Left, TicTacToeDomain.VertPosition.Bottom);
+                case "HCenterTop": return Tuple.Create(TicTacToeDomain.HorizPosition.HCenter, TicTacToeDomain.VertPosition.Top);
+                case "HCenterVCenter": return Tuple.Create(TicTacToeDomain.HorizPosition.HCenter, TicTacToeDomain.VertPosition.VCenter);
+                case "HCenterBottom": return Tuple.Create(TicTacToeDomain.HorizPosition.HCenter, TicTacToeDomain.VertPosition.Bottom);
+                case "RightTop": return Tuple.Create(TicTacToeDomain.HorizPosition.Right, TicTacToeDomain.VertPosition.Top);
+                case "RightVCenter": return Tuple.Create(TicTacToeDomain.HorizPosition.Right, TicTacToeDomain.VertPosition.VCenter);
+                case "RightBottom": return Tuple.Create(TicTacToeDomain.HorizPosition.Right, TicTacToeDomain.VertPosition.Bottom);
+                default: throw new Exception("cannot process cell state");
+            }
         }
     }
 
@@ -143,7 +138,7 @@ namespace TicTacToe.Wpf
     {
         private static readonly Unit Unit = (Unit)Activator.CreateInstance(typeof(Unit), true);
 
-        public static Func<T, Unit> ToFunc<T>(this Action<T> action)
+        private static Func<T, Unit> ToFunc<T>(this Action<T> action)
         {
             return x => { action(x); return Unit; };
         }
